@@ -781,7 +781,7 @@
     let currentLang = 'ko';
 
     // ⚠️ Cloudflare Worker 배포 후 실제 URL로 교체
-    const WORKER_URL = 'https://jaehyun-proxy.nosubjectforjh.workers.dev';
+    const WORKER_URL = 'ttps://jaehyun-proxy.nosubjectforjh.workers.dev';
 
     let currentBoxId   = '';
     let currentTitleId = '';
@@ -845,7 +845,7 @@
         document.getElementById('searchInput').placeholder = t.placeholder;
         document.querySelector('.close-btn').innerText = t.close;
         document.querySelector('.modal-title').innerHTML =
-            `${t.searchTitle}&nbsp;&nbsp;<em>JAEHYUN</em>`;
+            `${t.searchTitle}`;
 
         // username placeholder
         document.getElementById('usernameInput').placeholder = t.usernamePH;
@@ -883,7 +883,7 @@
         resultsList.style.display = 'block';
         resultsList.innerHTML = `<div style="padding:13px;text-align:center;font-size:13px;color:#737373;">${i18n[currentLang].searching}</div>`;
 
-        const searchTerm = encodeURIComponent(`JAEHYUN ${query}`);
+        const searchTerm = encodeURIComponent(query);
         fetch(`${WORKER_URL}?term=${searchTerm}`)
             .then(r => r.json())
             .then(data => {
@@ -898,6 +898,7 @@
                     const isJaehyunRelated =
                         artist.includes('JAEHYUN') ||
                         artist.includes('재현') ||
+                        artist.includes('정재현') ||
                         artist.includes('NCT DOJAEJUNG') ||
                         artist.includes('NCT 도재정') ||
                         artist.includes('NCT 127') ||
@@ -913,7 +914,7 @@
                         artist.includes('NCT WISH') ||
                         artist === 'WISH';
                     return isJaehyunRelated && !isExcluded;
-                }).slice(0, 25);
+                }).slice(0, 50);
 
                 if (!filtered.length) {
                     resultsList.innerHTML = `<div style="padding:13px;text-align:center;font-size:13px;color:#737373;">${i18n[currentLang].noResult}</div>`;
