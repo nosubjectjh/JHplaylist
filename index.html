@@ -232,7 +232,13 @@
             min-width: 0;
             text-align: right;
         }
-        .username-input::placeholder { color: rgba(122,143,181,0.45); font-weight: 400; }
+        .username-input::placeholder { color: #AAAAAA; font-weight: 400; }
+        .username-input:-webkit-autofill,
+        .username-input:-webkit-autofill:hover,
+        .username-input:-webkit-autofill:focus {
+            -webkit-box-shadow: 0 0 0 30px #FFFFFF inset !important;
+            -webkit-text-fill-color: #262626 !important;
+        }
         .bio-suffix {
             font-size: 13px;
             font-weight: 600;
@@ -882,8 +888,13 @@
             .then(r => r.json())
             .then(data => {
                 resultsList.innerHTML = '';
+                // 재현이 피처링/듀엣으로 참여한 곡 제목 화이트리스트
+                const titleWhitelist = ['try again'];
+
                 const filtered = (data.results || []).filter(song => {
                     const artist = song.artistName.toUpperCase().replace(/\s+/g, ' ').trim();
+                    const title  = song.trackName.toLowerCase().trim();
+
                     const isJaehyunRelated =
                         artist.includes('JAEHYUN') ||
                         artist.includes('재현') ||
@@ -892,7 +903,11 @@
                         artist.includes('NCT 127') ||
                         artist.includes('NCT U') ||
                         artist.includes('차민호') ||
-                        artist === 'NCT';
+                        artist.includes('D.EAR') ||
+                        artist.includes('디어') ||
+                        artist === 'NCT' ||
+                        titleWhitelist.some(t => title.includes(t));
+
                     const isExcluded =
                         artist.includes('NCT DREAM') ||
                         artist.includes('WAYV') ||
@@ -968,52 +983,53 @@
 
     // ── 이미지 다운로드 (카메라 버튼) ──
     function downloadImage() {
-    window.scrollTo(0, 0);
-    const btn = document.getElementById('cameraBtn');
-    btn.classList.add('saving');
+        window.scrollTo(0, 0);
+        const btn = document.getElementById('cameraBtn');
+        btn.classList.add('saving');
+        document.getElementById('hamburgerMenu').classList.remove('open');
 
-    document.getElementById('hamburgerMenu').classList.remove('open');
+        // html2canvas input 버그 우회:
+        // input의 value를 bio 영역 전체를 감싸는 div에 텍스트로 렌더링
+        const input = document.getElementById('usernameInput');
+        const suffix = document.querySelector('.bio-suffix');
+        const inputText = input.value || '';
 
-    const input = document.getElementById('usernameInput');
-    const inputText = input.value || '';
-    const span = document.createElement('span');
-    span.style.cssText = `
-        font-size: 13px;
-        font-weight: 900;
-        color: #262626;
-        font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-        text-align: right;
-        display: inline-block;
-        width: 100%;
-    `;
-    span.innerText = inputText;
-    input.style.display = 'none';
-    input.parentNode.insertBefore(span, input);
+        // bio 영역을 텍스트 전용 div로 임시 교체
+        const bio = document.querySelector('.profile-bio');
+        const originalHTML = bio.innerHTML;
+        bio.innerHTML = `<div style="
+            width: 100%;
+            text-align: right;
+            font-size: 13px;
+            font-weight: 900;
+            color: #262626;
+            font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            padding: 0 14px 12px;
+            box-sizing: border-box;
+        ">${inputText}<span style="font-weight:600;">'s Playlist</span></div>`;
 
-    setTimeout(() => {
-        html2canvas(document.getElementById('captureArea'), {
-            useCORS: true,
-            scale: 2,
-            backgroundColor: '#FFFFFF',
-            logging: false,
-            scrollX: -window.scrollX,
-            scrollY: -window.scrollY
-        }).then(canvas => {
-            span.remove();
-            input.style.display = '';
-            btn.classList.remove('saving');
-            const link = document.createElement('a');
-            link.download = '취향의_재현.png';
-            link.href = canvas.toDataURL('image/png');
-            link.click();
-        }).catch(() => {
-            span.remove();
-            input.style.display = '';
-            btn.classList.remove('saving');
-            alert('이미지 저장 중 오류가 발생했습니다.');
-        });
-    }, 150);
-}
+        setTimeout(() => {
+            html2canvas(document.getElementById('captureArea'), {
+                useCORS: true,
+                scale: 2,
+                backgroundColor: '#FFFFFF',
+                logging: false,
+                scrollX: -window.scrollX,
+                scrollY: -window.scrollY
+            }).then(canvas => {
+                bio.innerHTML = originalHTML;
+                btn.classList.remove('saving');
+                const link = document.createElement('a');
+                link.download = '취향의_재현.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            }).catch(() => {
+                bio.innerHTML = originalHTML;
+                btn.classList.remove('saving');
+                alert('이미지 저장 중 오류가 발생했습니다.');
+            });
+        }, 150);
+    }
 
     window.onload = initGrid;
 </script>
