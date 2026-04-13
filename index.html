@@ -968,39 +968,52 @@
 
     // ── 이미지 다운로드 (카메라 버튼) ──
     function downloadImage() {
-        window.scrollTo(0, 0);
-        const btn = document.getElementById('cameraBtn');
-        btn.classList.add('saving');
+    window.scrollTo(0, 0);
+    const btn = document.getElementById('cameraBtn');
+    btn.classList.add('saving');
 
-        const input = document.getElementById('usernameInput');
-        const savedPH = input.placeholder;
-        input.placeholder = '';
+    document.getElementById('hamburgerMenu').classList.remove('open');
 
-        // 메뉴 닫기
-        document.getElementById('hamburgerMenu').classList.remove('open');
+    const input = document.getElementById('usernameInput');
+    const inputText = input.value || '';
+    const span = document.createElement('span');
+    span.style.cssText = `
+        font-size: 13px;
+        font-weight: 900;
+        color: #262626;
+        font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        text-align: right;
+        display: inline-block;
+        width: 100%;
+    `;
+    span.innerText = inputText;
+    input.style.display = 'none';
+    input.parentNode.insertBefore(span, input);
 
-        setTimeout(() => {
-            html2canvas(document.getElementById('captureArea'), {
-                useCORS: true,
-                scale: 2,
-                backgroundColor: '#FFFFFF',
-                logging: false,
-                scrollX: -window.scrollX,
-                scrollY: -window.scrollY
-            }).then(canvas => {
-                input.placeholder = savedPH;
-                btn.classList.remove('saving');
-                const link = document.createElement('a');
-                link.download = '취향의_재현.png';
-                link.href = canvas.toDataURL('image/png');
-                link.click();
-            }).catch(() => {
-                input.placeholder = savedPH;
-                btn.classList.remove('saving');
-                alert('이미지 저장 중 오류가 발생했습니다.');
-            });
-        }, 150);
-    }
+    setTimeout(() => {
+        html2canvas(document.getElementById('captureArea'), {
+            useCORS: true,
+            scale: 2,
+            backgroundColor: '#FFFFFF',
+            logging: false,
+            scrollX: -window.scrollX,
+            scrollY: -window.scrollY
+        }).then(canvas => {
+            span.remove();
+            input.style.display = '';
+            btn.classList.remove('saving');
+            const link = document.createElement('a');
+            link.download = '취향의_재현.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }).catch(() => {
+            span.remove();
+            input.style.display = '';
+            btn.classList.remove('saving');
+            alert('이미지 저장 중 오류가 발생했습니다.');
+        });
+    }, 150);
+}
 
     window.onload = initGrid;
 </script>
