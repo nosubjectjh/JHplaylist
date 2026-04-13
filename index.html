@@ -891,6 +891,10 @@
                 // 재현이 피처링/듀엣으로 참여한 곡 제목 화이트리스트
                 const titleWhitelist = ['try again'];
 
+                // 디버그: 브라우저 콘솔에서 확인
+                console.log('전체 결과 수:', data.results?.length);
+                console.log('아티스트 목록:', data.results?.map(s => s.artistName));
+
                 const filtered = (data.results || []).filter(song => {
                     const artist = song.artistName.toUpperCase().replace(/\s+/g, ' ').trim();
                     const title  = song.trackName.toLowerCase().trim();
