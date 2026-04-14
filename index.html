@@ -889,7 +889,7 @@
             .then(data => {
                 resultsList.innerHTML = '';
                 // 재현이 피처링/듀엣으로 참여한 곡 제목 화이트리스트
-                const titleWhitelist = ['try again'];
+                const titleWhitelist = ['try again', 'call it off'];
 
                 const filtered = (data.results || []).filter(song => {
                     const artist = song.artistName.toUpperCase().replace(/\s+/g, ' ').trim();
